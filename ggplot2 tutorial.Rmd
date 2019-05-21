@@ -12,8 +12,6 @@ bibliography: bib.bib
 knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 library(RefManageR)
-bib <- ReadBib("~/Library/texmf/bibtex/bib/Master.bib") 
-myopts <- BibOptions(bib.style = "authoryear", style="latex", first.inits=FALSE, max.names = 20)
 ```
 
 # Introduction
@@ -66,17 +64,66 @@ ggplot(data = data, mapping = aes(x = x, y = y, ...), ...)
 
 The first part of what we see here is the `ggplot()` function itself. The second `data`, `x`, and `y` in this case all refer to those in our data. Inside the outer set of parentheses we first point the plotting function to our data (this needs to be an `R` dataframe that is available in the workspace—or it can be a tibble). This is the first place where we see major variations in code. Some people will leave off the `data = ` part and just type the name of the data object as a shortcut. I do this as well, but it can be confusing for folks new to `ggplot2`. The next block is for mapping our aesthetics. We rarely see the `mapping = ` part of the code, and we can again just shorcut things by using `aes()`. Within the `aes()` parentheses, we then map our `x` and `y` variables by following the same convention. That is, we either say `aes(x = x, y = y)` or simply `aes(x, y)`. Most of the remaining parts of the function typically need to specific, if for nothing else human readability. We will get to those later. 
 
-The next place we see major variation in code is whether folks assign their plot to an object or just run the code outright. This is not a huge distinction for actually making a plot when using well-structured code, but how we read the code certainly changes. Since `R` is an object-oriented programming language we can assign the whole plot to an object just like we can a dataset, variable, function, etc. The best way to see how this works is with an example. Returning to where we were above, 
+The next place we see major variation in code is whether folks assign their plot to an object or just run the code outright. This is not a huge distinction for actually making a plot when using well-structured code, but how we read the code certainly changes. Since `R` is an object-oriented programming language we can assign the whole plot to an object just like we can a dataset, variable, function, etc. The best way to see how this works is with an example. Returning to where we were above, we could instead assign our blank plot to an object called "`p`". Why "`p`"? No reason other than it is most commonly used in these cases. You could call it "`plot`", or anything you like as long as it adheres to `R`'s [object naming standards](https://adv-r.hadley.nz/names-values.html#introduction-1) (@Wickham:2019).
+
+```{r plot_p1}
+p <- ggplot(mtcars, aes(wt, mpg))
+```
+
+Now, using `R`'s object assignment operator, `<-`, we have assigned our plot to the object called "`p`". But notice also that the plot did not automatically return. To get that we need to simply ask `R` for it using the object name.
+
+```{r plot_p2}
+p
+```
+
+Now, where things get sometimes confusing, and this is jumping ahead, is when folks add additinal layers to the plot. If we wanted to see some points on the plot with our initial code above we could do this:
+
+```{r plot_p3}
+ggplot(mtcars, aes(wt, mpg)) +
+  geom_point()
+```
+
+Notice that we do this by adding a `+` (telling `ggplot()` there is a new layer incoming) and then we type the new code. I like to put each new layer on its own line and indent a little after the first line. That helps human readibility and allows us to root out bugs in the code. Using the object method we could do something similar. 
+
+```{r plot_p4}
+p <- ggplot(mtcars, aes(wt, mpg))
+p + geom_point()
+```
+
+Can you see any issue with this approach? It does work, but in my mind using the `object +` method is somewhat void of utility (short of some type of exhibition of functionality for vignettes) given that to get the new layer we have to call the object and the new layer together. What if, though, we reassigned the new layer to our object like this?
+
+```{r plot_p5}
+p <- ggplot(mtcars, aes(wt, mpg))
+p <- p + geom_point()
+```
+
+Now, the new `geom_point()` layer is also assigned to `p` and when we call `p` we should get it all:
+
+```{r plot_p6}
+p
+```
+
+There are uses to this approach, but it needs to be thought through. It makes reading the code a bit more difficult, and all of the assignment operators and plus signs can get busy. Keep in mind that you could also create new objects with each layer should that be useful. We will return to this later when I talk about saving our plots, but that should really only be a final step taken with care. For now, just know that when you see something like `p <- ggplot(...)` you should be able to just return `p` to get to the same place as you would be by using `ggplot(...)` directly.
 
 Finally, with the advent of the so-called pipe (`%>%`) operator from the maggritr package and later `dplyr`, among others, we will sometimes see folks do this:
 
 ```{r pipe}
-
+mtcars %>% 
+  ggplot(aes(wt, mpg))
 ```
 
 Indeed, I do this on occasion. Do not be scared off by the code, however, as we are just replacing our ggplot(`data = data`,...) with `data %>% ggplot(...)` and thus it is a simple reordering of the code. Since we cannot work with pipes beyond this in `ggplot` it really just becomes a niche habit and not particualry useful otherwise.^[Note that you need to load a package that uses the pipe in order to use it as `ggplot2` does not load it automatically.]
 
 ### Geometric Shapes (`geom`) and Statistical Transformations (`stat`)
+
+Let's get back to how to make plots. Our next step is adding geometric shapes and statistical transformations. We had a glimpse at this earlier, but let's resume with the same plot:
+
+```{r geom_1}
+ggplot(mtcars, aes(wt, mpg)) +
+  geom_point()
+```
+
+In this case, we have asked `ggplot()` to add points to the plot and thus we now have a scatterplot. The "geoms" are numerous, and they are the key to what type of plot you end up with whether it be a bar graph, line graph, histogram, or more. 
 
 ### Scales
 
@@ -88,9 +135,11 @@ There are many, many opinions on how plots should look. As such, the style we en
 
 ## Building Your Own Theme
 
+## Example Code for Lots of Plots
+
 ## Extensions 
 
-One the most amazing aspects of `ggplot2` is the sheer number of extensions that smart folks have created for it. In and of itself, `ggplot2` solves more plotting problems that most any other plotting package I know of (within `R` or not). When you add the literally dozens of additional extenstions (usually prefixed with `gg`) it becomes a tour de force in data vizualization. The place to start is the [extensions gallery](http://www.ggplot2-exts.org/gallery/) on the main `ggplot2` website. Some really incredible examples include [`gganimate`](https://gganimate.com) for making animated gifs, [`ggthemes`](https://github.com/jrnold/ggthemes) for some ready-made additional themes (including one that makes your graph look like it was made in default Stata!), [`ggforce`](https://ggforce.data-imaginist.com) for some serious added functionality, and [`ggTimeSeries`](https://github.com/AtherEnergy/ggTimeSeries) for time-specific graphs. There are, of course, many more that are worth exploring.
+One the most amazing aspects of `ggplot2` is the sheer number of extensions that smart folks have created for it. In and of itself, `ggplot2` solves more plotting problems that most any other plotting package I know of (within `R` or not). When you add the literally dozens of additional extenstions (usually prefixed with `gg`) it becomes a tour de force in data vizualization. The place to start is the [extensions gallery](http://www.ggplot2-exts.org/gallery/) on the main `ggplot2` website. Some really incredible examples include [`gganimate`](https://gganimate.com) for making animated gifs, [`ggthemes`](https://github.com/jrnold/ggthemes) for some ready-made additional themes (including one that makes your graph look like it was made in default Stata!), [`ggforce`](https://ggforce.data-imaginist.com) for some serious added functionality, and [`ggTimeSeries`](https://github.com/AtherEnergy/ggTimeSeries) for time-specific graphs. There are, of course, many more that are worth exploring. In the few examples that follow I am not showing the code as it the graphs are just proof of concepts mainly from the package vignettes. If you really want to learn these packages I reccomend exploring them directly. If you really want the code then it is in the .Rmd document that generate this site.
 
 #### `gganimate`
 
@@ -181,7 +230,7 @@ p1 +
    coord_fixed( 0.2 * diff(range(dfData$Time)) / diff(range(dfData$Signal)))
 ```
 
-It also warrants mentioning that many packages include `ggplot2` objects in their own flavor of making graphs. The syntax ends up being different in most cases to get started, but the output is a `ggplot2` object that can then be manipulated. One of my favorites in this regard is the [`sjPlot`](https://strengejacke.github.io/sjPlot/) package from [@strengejacke](https://github.com/strengejacke) which I use for plotting Likert scales. Others include [`urbnmapr`](https://github.com/UrbanInstitute/urbnmapr) from the [Urban Institute](https://www.urban.org) for making easy-peasy U.S. state maps (who wants to do that anyway?), [choroplethr](https://cran.r-project.org/web/packages/choroplethr/index.html) also for maps, and [ggplotly](https://plot.ly/ggplot2/) for interactive graphics.
+It also warrants mentioning that many packages include `ggplot2` objects in their own flavor of making graphs. The syntax ends up being different in most cases to get started, but the output is a `ggplot2` object that can then be manipulated. One of my favorites in this regard is the [`sjPlot`](https://strengejacke.github.io/sjPlot/) package from [`@strengejacke`](https://github.com/strengejacke) which I use for plotting Likert scales (see my example below). Others include [`urbnmapr`](https://github.com/UrbanInstitute/urbnmapr) from the [Urban Institute](https://www.urban.org) for making easy-peasy U.S. state maps (who wants to do that anyway?), [choroplethr](https://cran.r-project.org/web/packages/choroplethr/index.html) also for maps, and [ggplotly](https://plot.ly/ggplot2/) for interactive graphics.
 
 #### `sjPlot` 
 
@@ -265,6 +314,13 @@ There are no shortage of other `ggplot2` tutorials available online. Just snoop 
 
  - [The `ggplot2` homepage](https://ggplot2.tidyverse.org)
  - [The `ggplot2` cheatsheet](https://github.com/rstudio/cheatsheets/blob/master/data-visualization-2.1.pdf)
+ - [This workshop from Harvard](https://tutorials.iq.harvard.edu/R/Rgraphics/Rgraphics.html)
+ - [This guide from <r-statistics.co>](http://r-statistics.co/ggplot2-Tutorial-With-R.html)
+ - [This one, too](http://r-statistics.co/Complete-Ggplot2-Tutorial-Part1-With-R-Code.html)
+ - [This repo from Jenny Bryan](https://github.com/jennybc/ggplot2-tutorial)
+ - [This tutorial from UC Business Analytics](https://uc-r.github.io/ggplot_intro)    
+ - [This tutorial from Zev Ross](http://zevross.com/blog/2014/08/04/beautiful-plotting-in-r-a-ggplot2-cheatsheet-3/)
+ - [UCLA IDRE](https://stats.idre.ucla.edu/r/seminars/ggplot2_intro/)
 
 ## References
 
