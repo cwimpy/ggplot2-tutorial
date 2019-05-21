@@ -1,0 +1,270 @@
+---
+title: "GGPLOT2 Tutorial"
+author: "Cameron Wimpy"
+date: "2019-05-15 (updated: `r Sys.Date()`)"
+output:
+  rmdformats::readthedown:
+    highlight: kate
+bibliography: bib.bib 
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(RefManageR)
+bib <- ReadBib("~/Library/texmf/bibtex/bib/Master.bib") 
+myopts <- BibOptions(bib.style = "authoryear", style="latex", first.inits=FALSE, max.names = 20)
+```
+
+# Introduction
+
+This is a tutorial for using [`R`](https://www.r-project.org/) and [`ggplot2`](https://ggplot2.tidyverse.org) to make publication-ready plots for use in the social science.^[The tidyverse website is a wonderful place to spend your time.] The tutorial assumes moderate familiarity with `R` and base functions. I primarily made this as a learning tool for my POSC 3003/6003 courses at [Arkansas State University](astate.edu). As such, my focus is on applications relevant to political scientists but I suspect this could be of interest to many others interested in `R` graphics. The associated video vignette (for students in my course) on the topic provides additional details and a walkthough every aspect of the code provided here. We will be using built-in (or generated) datasets for this entire document as I want this to remain as self-contained as possible. I hope this document can serve both as a guide for learning `ggplot2` along with some `tidyverse` operations as well as a long-term resource on how to make a given graph. Thanks goes to the many, many folks who have provided their code openly and freely for the rest of us to learn from. All credit goes to them.
+
+I should note that I am far from the best expert on this topic, and there are likely better tutorials out there. It is also worth noting that there are many plot types I will not include. Finally, I will not be covering every single possible aspect of plot customization. In any case, I hope some folks find this useful. If you find issues or have suggestions please hit me up on GitHub [`(@cwimpy)`](https://github.com/cwimpy) or via e-mail. 
+
+I move along in a series of sections. First I introduce `ggplot2` for the one reader that has never heard of it. Then I show a series of examples for getting started along with important features. After that I show how to make a plot look nice before moving into as many examples as I can conjur. I am always adding to this section. Finally, I conclude by showing some extensions and other helpful tips such as exporting plots and using packages written to deal with special `ggplot2` problems.
+
+The source code for this document can be found in my GitHub here: <https://github.com/cwimpy/ggplot2-tutorial>, please also use this if you have suggestions or improvements!
+
+## The Grammar of Graphics
+
+Now let's move on to to learning about `ggplot2`. `ggplot2` is an `R` graphic package developed by [Hadley Wickham](http://hadley.nz) to implement the [grammar of graphics] (http://www.amazon.com/The-Grammar-Graphics-Statistics-Computing/dp/0387245448) system of data visualization proposed by [Leland Wilkinson](https://www.cs.uic.edu/~wilkinson/).^[If you really want to learn about this I suggest buying the respective books from [Wickham](https://www.amazon.com/ggplot2-Elegant-Graphics-Data-Analysis/dp/331924275X/ref=as_li_ss_tl?ie=UTF8&linkCode=sl1&tag=ggplot2-20&linkId=4b4de5146fdafd09b8035e8aa656f300), [Wilkinson](http://www.amazon.com/The-Grammar-Graphics-Statistics-Computing/dp/0387245448), and possibly others (@Wilkinson:2006, @Wickham:2016, @Wickham:2017). The [R for Data Science](https://r4ds.had.co.nz) book is also a great resource. I do not know these authors but highly respect their work (obviously, that's the point of all this!).] The general idea is that all plots should have some basic features that make them interchangeable in the same way, no matter what is being plotted. This of it as a language for reading and writing plots. In practice `ggplot2` has become the gold standard for plotting statistical data in most statistical-heavy disciplines such as bio-statistics, economics, political science, and statistics. The basic `ggplot2` implementation of the grammar of graphics is summarized as follows:
+
+ - a default dataset with aesthetic mappings,
+ - one or more layers, each with a geometric object("geom"), a statistical transformation("stat"), and a dataset with aesthetic mappings (possibly defaulted),
+ - a scale for each aesthetic mapping (which can be automatically generated),
+ - a coordinate system, and
+ - a facet specification.
+ 
+ We will tackle the meaning of these items in practical terms as we proceed. The basic idea is that a plot can (perhaps should) be built in layers and should consist of a core set of items in order to adher to the grammmar of graphics. 
+ 
+## Getting Started
+
+We will use the `mtcars` dataset for many of our example plots. Let's have a look at what are in those data. Note that I loaded the `tidyverse` package quietly at the beginning of this document and that it includes `ggplot2` and other tools we will be using throughout (`dplyr`, for example).
+
+```{r mtcars}
+glimpse(mtcars)
+```
+
+Now we can draw a blank plot where are mapped aethetics are miles per gallon (`mpg`) and car weight (`wt`). 
+
+```{r plot_blank}
+ggplot(mtcars, aes(wt, mpg))
+```
+
+Now we can get started with `ggplot()`, the primary (and neccessary) engine underlying the `ggplot2` package.
+
+### Aesethtics
+
+### A Note on Coding Style for `ggplot2`
+
+Before moving further, I want to make sure that the code structure is clearly understood. Experienced `R` users (or otherwise experienced programmers) will likely struggle with this far less than I did for the longest time. Let's first look at the core aspects of the `ggplot()` code structure:
+
+```{r code1, eval=FALSE}
+ggplot(data = data, mapping = aes(x = x, y = y, ...), ...)
+```
+
+The first part of what we see here is the `ggplot()` function itself. The second `data`, `x`, and `y` in this case all refer to those in our data. Inside the outer set of parentheses we first point the plotting function to our data (this needs to be an `R` dataframe that is available in the workspace—or it can be a tibble). This is the first place where we see major variations in code. Some people will leave off the `data = ` part and just type the name of the data object as a shortcut. I do this as well, but it can be confusing for folks new to `ggplot2`. The next block is for mapping our aesthetics. We rarely see the `mapping = ` part of the code, and we can again just shorcut things by using `aes()`. Within the `aes()` parentheses, we then map our `x` and `y` variables by following the same convention. That is, we either say `aes(x = x, y = y)` or simply `aes(x, y)`. Most of the remaining parts of the function typically need to specific, if for nothing else human readability. We will get to those later. 
+
+The next place we see major variation in code is whether folks assign their plot to an object or just run the code outright. This is not a huge distinction for actually making a plot when using well-structured code, but how we read the code certainly changes. Since `R` is an object-oriented programming language we can assign the whole plot to an object just like we can a dataset, variable, function, etc. The best way to see how this works is with an example. Returning to where we were above, 
+
+Finally, with the advent of the so-called pipe (`%>%`) operator from the maggritr package and later `dplyr`, among others, we will sometimes see folks do this:
+
+```{r pipe}
+
+```
+
+Indeed, I do this on occasion. Do not be scared off by the code, however, as we are just replacing our ggplot(`data = data`,...) with `data %>% ggplot(...)` and thus it is a simple reordering of the code. Since we cannot work with pipes beyond this in `ggplot` it really just becomes a niche habit and not particualry useful otherwise.^[Note that you need to load a package that uses the pipe in order to use it as `ggplot2` does not load it automatically.]
+
+### Geometric Shapes (`geom`) and Statistical Transformations (`stat`)
+
+### Scales
+
+### Facets
+
+### Making Your Plot Look Good
+
+There are many, many opinions on how plots should look. As such, the style we end up with here will mainly be my own preference. Hopefully between this and the next section I can give you the tools you need to make the plots look as you would like them to. This is also where the library of options within `ggplot2` explodes, so I am certainly not calling this a comprehensive treatment of plot improvement beyond the default.^[Years ago when I was a graduate student you wanted to use the default to show you could use `R` and `ggplot2`. These days, since everyone is doing it, the goal is often to move as far from the default as possible.] 
+
+## Building Your Own Theme
+
+## Extensions 
+
+One the most amazing aspects of `ggplot2` is the sheer number of extensions that smart folks have created for it. In and of itself, `ggplot2` solves more plotting problems that most any other plotting package I know of (within `R` or not). When you add the literally dozens of additional extenstions (usually prefixed with `gg`) it becomes a tour de force in data vizualization. The place to start is the [extensions gallery](http://www.ggplot2-exts.org/gallery/) on the main `ggplot2` website. Some really incredible examples include [`gganimate`](https://gganimate.com) for making animated gifs, [`ggthemes`](https://github.com/jrnold/ggthemes) for some ready-made additional themes (including one that makes your graph look like it was made in default Stata!), [`ggforce`](https://ggforce.data-imaginist.com) for some serious added functionality, and [`ggTimeSeries`](https://github.com/AtherEnergy/ggTimeSeries) for time-specific graphs. There are, of course, many more that are worth exploring.
+
+#### `gganimate`
+
+```{r gganimate, echo=FALSE}
+library(gapminder)
+library(gganimate)
+
+# Note: This is example code from the package
+
+ggplot(gapminder, aes(gdpPercap, lifeExp, size = pop, colour = country)) +
+  geom_point(alpha = 0.7, show.legend = FALSE) +
+  scale_colour_manual(values = country_colors) +
+  scale_size(range = c(2, 12)) +
+  scale_x_log10() +
+  facet_wrap(~continent) +
+  # Here comes the gganimate specific bits
+  labs(title = 'Year: {frame_time}', x = 'GDP per capita', y = 'life expectancy') +
+  transition_time(year) +
+  ease_aes('linear')
+```
+
+#### `ggthemes`
+
+```{r ggthemes, echo=FALSE}
+library(ggthemes)
+
+mtcars %>% 
+  ggplot(aes(mpg, wt)) + 
+  geom_point() + 
+  theme_stata()
+```
+
+#### `ggforce`
+
+```{r ggforce, echo=FALSE}
+library(ggforce)
+
+# Note: This is example code (slightly modified) from the package
+
+# We'll start by defining some dummy data
+pie <- data.frame(
+    state = c('eaten', 'eaten but said you didn\'t', 'cat took it', 
+              'for tonight', 'will decompose slowly'),
+    focus = c(0.2, 0, 0, 0, 0),
+    start = c(0, 1, 2, 3, 4),
+    end = c(1, 2, 3, 4, 2*pi),
+    amount = c(4,3, 1, 1.5, 6),
+    stringsAsFactors = FALSE
+)
+
+p <- ggplot() + theme_no_axes() + coord_fixed()
+
+# The wedges can be exploded away from the centre using the explode aesthetic
+p + geom_arc_bar(aes(x0 = 0, y0 = 0, r0 = 0, r = 1, amount = amount, 
+                     fill = state, explode = focus),
+                 data = pie, stat = 'pie')
+```
+
+#### `ggtimeseries`
+
+```{r ggtimeseries, echo=FALSE}
+library(ggTimeSeries)
+
+# Note: This is example code from the package
+
+set.seed(10)
+dfData = data.frame(
+   Time = 1:1000,
+   Signal = abs(
+      c(
+         cumsum(rnorm(1000, 0, 3)),
+         cumsum(rnorm(1000, 0, 4)),
+         cumsum(rnorm(1000, 0, 1)),
+         cumsum(rnorm(1000, 0, 2))
+      )
+   ),
+   VariableLabel = c(rep('Class A', 1000), rep('Class B', 1000), rep('Class C', 1000), rep('Class D', 1000))
+)
+
+# base plot
+p1 = ggplot(dfData, aes(x = Time, y = Signal, group = VariableLabel, fill = VariableLabel)) +
+  stat_steamgraph()
+
+# adding some formatting
+p1 +
+   xlab(NULL) +
+   ylab(NULL) +
+   coord_fixed( 0.2 * diff(range(dfData$Time)) / diff(range(dfData$Signal)))
+```
+
+It also warrants mentioning that many packages include `ggplot2` objects in their own flavor of making graphs. The syntax ends up being different in most cases to get started, but the output is a `ggplot2` object that can then be manipulated. One of my favorites in this regard is the [`sjPlot`](https://strengejacke.github.io/sjPlot/) package from [@strengejacke](https://github.com/strengejacke) which I use for plotting Likert scales. Others include [`urbnmapr`](https://github.com/UrbanInstitute/urbnmapr) from the [Urban Institute](https://www.urban.org) for making easy-peasy U.S. state maps (who wants to do that anyway?), [choroplethr](https://cran.r-project.org/web/packages/choroplethr/index.html) also for maps, and [ggplotly](https://plot.ly/ggplot2/) for interactive graphics.
+
+#### `sjPlot` 
+
+```{r sjPlot, echo=FALSE, message=FALSE, warning=FALSE}
+library(sjPlot)
+library(sjmisc)
+library(haven)
+
+theme_cam <- function () { 
+  theme_minimal(base_size = 9, base_family = "SF Pro Text") %+replace% 
+    theme(
+      panel.background  = element_blank(),
+      panel.border = element_blank(),
+      plot.background = element_blank(), 
+      plot.margin = unit(c(1,2,1,1), "cm"),
+      legend.box.background = element_rect(fill = "white", color = NA),
+      legend.key = element_rect(fill = NA, color=NA, size = 4),
+      legend.text = element_text(color = "black", size = 8),
+      legend.title = element_text(color = "black", size = 10),
+      legend.position = "bottom",
+      legend.direction = "horizontal",
+      panel.grid.major = element_line(color = "#C4C4C4"),
+      panel.grid.minor = element_blank(),
+      axis.text = element_text(color = "black"),
+      axis.title.y = element_text(color = "black", size = 10, angle = 90,
+                                  margin = margin(t = 0, r = 6, b = 0, l = 0)),
+      axis.title.x = element_text(color = "black", size = 10, angle = 0,
+                                  margin = margin(t = 6, r = 0, b = 0, l = 0)),
+      plot.title = element_text(size = 14, color = "black", hjust = 0.5, 
+                                vjust=2, margin = margin(b = 10)),
+      plot.subtitle = element_text(size = 12, color = "black", hjust = 0.5, 
+                                   margin = margin(b = 6)),
+      plot.caption = element_text(size = 8, margin = margin(t = 10), color = 
+                                    "black", hjust = 0)
+    )
+}
+
+spae.2016 <- read_dta("data/2016_spae.dta")
+
+reforms <- spae.2016 %>% 
+  select(starts_with("Q44"), weight) 
+
+color <- c("#329932","#7fbf7f","#ff7f7f", "#ff1919")
+
+items <- c("Vote by internet", 
+           "Vote by cell phone", 
+           "Vote by mail",  
+           "Auto-register at 18", 
+           "Election Day registration", 
+           "Require voter ID", 
+           "Require paper backup", 
+           "Election Day on weekend", 
+           "Election Day a holiday", 
+           "Non-partisan elections", 
+           "Auto-register after move"
+           )
+
+set_theme(axis.textsize = 10,
+  geom.outline.size = 1, 
+  geom.label.size = 1.5,
+  geom.label.color = "grey10")
+
+p <- find_var(reforms, pattern = "Q44", out = "df") %>% 
+  plot_likert(show.n = FALSE, show.prc.sign = TRUE, geom.colors = color, digits = 1, 
+              sort.frq = "pos.desc", weight.by = reforms$weight, axis.labels = items) + 
+  guides(fill = guide_legend(
+    keyheight = unit(2, units = "mm"),
+    keywidth = unit(length(labels), units = "mm"),
+    nrow = 1,
+    reverse = T,
+    label.position = "bottom")) + 
+  labs(title = "Attitudes Towards Election Reform", subtitle = "SPAE: 2016 Election") + 
+  theme_cam() +
+  theme( panel.grid = element_blank(), legend.spacing.x = unit(.1, 'cm')) 
+p
+```
+
+## Where to Learn More
+
+There are no shortage of other `ggplot2` tutorials available online. Just snoop around until you find one you like via your search engine of choice. There are, however, a few stops I reccomend along the way:
+
+ - [The `ggplot2` homepage](https://ggplot2.tidyverse.org)
+ - [The `ggplot2` cheatsheet](https://github.com/rstudio/cheatsheets/blob/master/data-visualization-2.1.pdf)
+
+## References
+
