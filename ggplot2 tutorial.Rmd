@@ -20,7 +20,7 @@ This is a tutorial for using [`R`](https://www.r-project.org/) and [`ggplot2`](h
 
 I should note that I am far from the best expert on this topic, and there are likely better tutorials out there. It is also worth noting that there are many plot types I will not include. Finally, I will not be covering every single possible aspect of plot customization. In any case, I hope some folks find this useful. If you find issues or have suggestions please hit me up on GitHub [`(@cwimpy)`](https://github.com/cwimpy) or via e-mail. 
 
-I move along in a series of sections. First I introduce `ggplot2` for the one reader that has never heard of it. Then I show a series of examples for getting started along with important features. After that I show how to make a plot look nice before moving into as many examples as I can conjur. I am always adding to this section. Finally, I conclude by showing some extensions and other helpful tips such as exporting plots and using packages written to deal with special `ggplot2` problems.
+I move along in a series of sections. First I introduce `ggplot2` for the one reader that has never heard of it. Then I show a series of examples for getting started along with important features. After that I show how to make a plot look nice before moving into as many examples as I can conjure. I am always adding to this section. Finally, I conclude by showing some extensions and other helpful tips such as exporting plots and using packages written to deal with special `ggplot2` problems.
 
 The source code for this document can be found in my GitHub here: <https://github.com/cwimpy/ggplot2-tutorial>, please also use this if you have suggestions or improvements!
 
@@ -34,7 +34,7 @@ Now let's move on to to learning about `ggplot2`. `ggplot2` is an `R` graphic pa
  - a coordinate system, and
  - a facet specification.
  
- We will tackle the meaning of these items in practical terms as we proceed. The basic idea is that a plot can (perhaps should) be built in layers and should consist of a core set of items in order to adher to the grammmar of graphics. 
+ We will tackle the meaning of these items in practical terms as we proceed. The basic idea is that a plot can (perhaps should) be built in layers and should consist of a core set of items in order to adhere to the grammar of graphics. 
  
 ## Getting Started
 
@@ -44,15 +44,17 @@ We will use the `mtcars` dataset for many of our example plots. Let's have a loo
 glimpse(mtcars)
 ```
 
-Now we can draw a blank plot where are mapped aethetics are miles per gallon (`mpg`) and car weight (`wt`). 
+Now we can draw a blank plot where are mapped aesthetics are miles per gallon (`mpg`) and car weight (`wt`). 
 
 ```{r plot_blank}
 ggplot(mtcars, aes(wt, mpg))
 ```
 
-Now we can get started with `ggplot()`, the primary (and neccessary) engine underlying the `ggplot2` package.
+Now we can get started with `ggplot()`, the primary (and necessary) engine underlying the `ggplot2` package.
 
-### Aesethtics
+### Aesthetics
+
+Our plot above, created by `ggplot(mtcars, aes(wt, mpg))`, included aesthetic mappings for our two variables car weight and miles per gallon. The mapping provided by `aes(x, y)` is bar far the most important part of aesthetics, but it is also the easiest. In most common use cases of `ggplot2` the `(x, y)` portion of the code simply refers to our `x` and `y` variables—two things we should already know! We will start adding other aesthetics as we move along but these are absolutely key.
 
 ### A Note on Coding Style for `ggplot2`
 
@@ -62,7 +64,7 @@ Before moving further, I want to make sure that the code structure is clearly un
 ggplot(data = data, mapping = aes(x = x, y = y, ...), ...)
 ```
 
-The first part of what we see here is the `ggplot()` function itself. The second `data`, `x`, and `y` in this case all refer to those in our data. Inside the outer set of parentheses we first point the plotting function to our data (this needs to be an `R` dataframe that is available in the workspace—or it can be a tibble). This is the first place where we see major variations in code. Some people will leave off the `data = ` part and just type the name of the data object as a shortcut. I do this as well, but it can be confusing for folks new to `ggplot2`. The next block is for mapping our aesthetics. We rarely see the `mapping = ` part of the code, and we can again just shorcut things by using `aes()`. Within the `aes()` parentheses, we then map our `x` and `y` variables by following the same convention. That is, we either say `aes(x = x, y = y)` or simply `aes(x, y)`. Most of the remaining parts of the function typically need to specific, if for nothing else human readability. We will get to those later. 
+The first part of what we see here is the `ggplot()` function itself. The second `data`, `x`, and `y` in this case all refer to those in our data. Inside the outer set of parentheses we first point the plotting function to our data (this needs to be an `R` dataframe that is available in the workspace—or it can be a tibble). This is the first place where we see major variations in code. Some people will leave off the `data = ` part and just type the name of the data object as a shortcut. I do this as well, but it can be confusing for folks new to `ggplot2`. The next block is for mapping our aesthetics. We rarely see the `mapping = ` part of the code, and we can again just shortcut things by using `aes()`. Within the `aes()` parentheses, we then map our `x` and `y` variables by following the same convention. That is, we either say `aes(x = x, y = y)` or simply `aes(x, y)`. Most of the remaining parts of the function typically need to specific, if for nothing else human readability. We will get to those later. 
 
 The next place we see major variation in code is whether folks assign their plot to an object or just run the code outright. This is not a huge distinction for actually making a plot when using well-structured code, but how we read the code certainly changes. Since `R` is an object-oriented programming language we can assign the whole plot to an object just like we can a dataset, variable, function, etc. The best way to see how this works is with an example. Returning to where we were above, we could instead assign our blank plot to an object called "`p`". Why "`p`"? No reason other than it is most commonly used in these cases. You could call it "`plot`", or anything you like as long as it adheres to `R`'s [object naming standards](https://adv-r.hadley.nz/names-values.html#introduction-1) (@Wickham:2019).
 
@@ -76,14 +78,14 @@ Now, using `R`'s object assignment operator, `<-`, we have assigned our plot to 
 p
 ```
 
-Now, where things get sometimes confusing, and this is jumping ahead, is when folks add additinal layers to the plot. If we wanted to see some points on the plot with our initial code above we could do this:
+Now, where things get sometimes confusing, and this is jumping ahead, is when folks add additional layers to the plot. If we wanted to see some points on the plot with our initial code above we could do this:
 
 ```{r plot_p3}
 ggplot(mtcars, aes(wt, mpg)) +
   geom_point()
 ```
 
-Notice that we do this by adding a `+` (telling `ggplot()` there is a new layer incoming) and then we type the new code. I like to put each new layer on its own line and indent a little after the first line. That helps human readibility and allows us to root out bugs in the code. Using the object method we could do something similar. 
+Notice that we do this by adding a `+` (telling `ggplot()` there is a new layer incoming) and then we type the new code. I like to put each new layer on its own line and indent a little after the first line. That helps human readability and allows us to root out bugs in the code. Using the object method we could do something similar. 
 
 ```{r plot_p4}
 p <- ggplot(mtcars, aes(wt, mpg))
@@ -112,7 +114,7 @@ mtcars %>%
   ggplot(aes(wt, mpg))
 ```
 
-Indeed, I do this on occasion. Do not be scared off by the code, however, as we are just replacing our ggplot(`data = data`,...) with `data %>% ggplot(...)` and thus it is a simple reordering of the code. Since we cannot work with pipes beyond this in `ggplot` it really just becomes a niche habit and not particualry useful otherwise.^[Note that you need to load a package that uses the pipe in order to use it as `ggplot2` does not load it automatically.]
+Indeed, I do this on occasion. Do not be scared off by the code, however, as we are just replacing our ggplot(`data = data`,...) with `data %>% ggplot(...)` and thus it is a simple reordering of the code. Since we cannot work with pipes beyond this in `ggplot` it really just becomes a niche habit and not particularity useful otherwise.^[Note that you need to load a package that uses the pipe in order to use it as `ggplot2` does not load it automatically.]
 
 ### Geometric Shapes (`geom`) and Statistical Transformations (`stat`)
 
@@ -123,7 +125,28 @@ ggplot(mtcars, aes(wt, mpg)) +
   geom_point()
 ```
 
-In this case, we have asked `ggplot()` to add points to the plot and thus we now have a scatterplot. The "geoms" are numerous, and they are the key to what type of plot you end up with whether it be a bar graph, line graph, histogram, or more. 
+In this case, we have asked `ggplot()` to add points to the plot and thus we now have a scatterplot. The "geoms" are numerous, and they are the key to what type of plot you end up with whether it be a bar graph, line graph, histogram, or more. See a list [here](https://ggplot2.tidyverse.org/reference/). Let's add a linear best fit (regression) line to our scatterplot using another geom called `geom_smooth()`.
+
+```{r geom_2}
+ggplot(mtcars, aes(wt, mpg)) +
+  geom_point() +
+  geom_smooth(formula = y ~ x, method = lm)
+```
+
+Note that `geom_smooth` needs to know what kind of method we are using and the formula for the calculation of the slope. In this case we are using similar syntax to that of base `R`'s regression model function, `lm`. Our formula simply tells `ggplot()` we want to see the relationship denoted by $y = f(x)$. What if we instead wanted a horizontal line in the middle of the scatterplot? Note that this type of geom requires that you know the coordinates of the data you are plotting. 
+
+```{r geom_3}
+ggplot(mtcars, aes(wt, mpg)) +
+  geom_point() +
+  geom_abline(intercept = 22.5, slope = 0)
+```
+
+Let's look at some other options starting with a bar plot. We will start by looking at the number of cars for each number of possible carburetors.
+
+```{r geom_4}
+ggplot(mtcars, aes(carb)) + 
+  geom_bar() 
+```
 
 ### Scales
 
@@ -139,7 +162,7 @@ There are many, many opinions on how plots should look. As such, the style we en
 
 ## Extensions 
 
-One the most amazing aspects of `ggplot2` is the sheer number of extensions that smart folks have created for it. In and of itself, `ggplot2` solves more plotting problems that most any other plotting package I know of (within `R` or not). When you add the literally dozens of additional extenstions (usually prefixed with `gg`) it becomes a tour de force in data vizualization. The place to start is the [extensions gallery](http://www.ggplot2-exts.org/gallery/) on the main `ggplot2` website. Some really incredible examples include [`gganimate`](https://gganimate.com) for making animated gifs, [`ggthemes`](https://github.com/jrnold/ggthemes) for some ready-made additional themes (including one that makes your graph look like it was made in default Stata!), [`ggforce`](https://ggforce.data-imaginist.com) for some serious added functionality, and [`ggTimeSeries`](https://github.com/AtherEnergy/ggTimeSeries) for time-specific graphs. There are, of course, many more that are worth exploring. In the few examples that follow I am not showing the code as it the graphs are just proof of concepts mainly from the package vignettes. If you really want to learn these packages I reccomend exploring them directly. If you really want the code then it is in the .Rmd document that generate this site.
+One the most amazing aspects of `ggplot2` is the sheer number of extensions that smart folks have created for it. In and of itself, `ggplot2` solves more plotting problems that most any other plotting package I know of (within `R` or not). When you add the literally dozens of additional extensions (usually prefixed with `gg`) it becomes a tour de force in data visualization. The place to start is the [extensions gallery](http://www.ggplot2-exts.org/gallery/) on the main `ggplot2` website. Some really incredible examples include [`gganimate`](https://gganimate.com) for making animated gifs, [`ggthemes`](https://github.com/jrnold/ggthemes) for some ready-made additional themes (including one that makes your graph look like it was made in default Stata!), [`ggforce`](https://ggforce.data-imaginist.com) for some serious added functionality, and [`ggTimeSeries`](https://github.com/AtherEnergy/ggTimeSeries) for time-specific graphs. There are, of course, many more that are worth exploring. In the few examples that follow I am not showing the code as it the graphs are just proof of concepts mainly from the package vignettes. If you really want to learn these packages I recommend exploring them directly. If you really want the code then it is in the .Rmd document that generate this site.
 
 #### `gganimate`
 
@@ -310,7 +333,7 @@ p
 
 ## Where to Learn More
 
-There are no shortage of other `ggplot2` tutorials available online. Just snoop around until you find one you like via your search engine of choice. There are, however, a few stops I reccomend along the way:
+There are no shortage of other `ggplot2` tutorials available online. Just snoop around until you find one you like via your search engine of choice. There are, however, a few stops I recommend along the way:
 
  - [The `ggplot2` homepage](https://ggplot2.tidyverse.org)
  - [The `ggplot2` cheatsheet](https://github.com/rstudio/cheatsheets/blob/master/data-visualization-2.1.pdf)
