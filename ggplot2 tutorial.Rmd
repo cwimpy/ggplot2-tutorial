@@ -169,6 +169,11 @@ There are many types of geoms, but hopefully now you are getting an idea of how 
 
 Scales are used within `ggplot2` to determine how the data being plotted looks to those of us reading the plot. I use scales in two primary ways, one to control the colors of the geoms and the other to format the axes. There are more extensions as well, but let's just focus on these two for now to create an illustrative example. 
 
+```{r}
+ggplot(mtcars, aes(wt, mpg, color = carb)) + 
+  geom_point() +
+  scale_color_continuous()
+```
 
 
 ### Coordinate Systems
@@ -203,6 +208,15 @@ There are many, many opinions on how plots should look. As such, the style we en
 #### Themes
 
 In terms of the overall look of the plot, `ggplot2` includes a number of built-in themes. Let's take a look at all of them here.^[For more themes, see the section in this document where I reference the `ggthemes` package. To be really cool, see the section that follows on creating your own theme.]
+
+##### Black & White
+
+```{r theme_bw}
+ggplot(mtcars, aes(wt, mpg)) +
+  geom_point() +
+  geom_smooth(formula = y ~ x, method = lm) +
+  theme_grey()
+```
 
 ## Building Your Own Theme
 
