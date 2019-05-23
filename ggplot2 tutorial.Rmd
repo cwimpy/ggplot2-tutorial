@@ -11,7 +11,6 @@ bibliography: bib.bib
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
-library(RefManageR)
 ```
 
 # Introduction
@@ -26,7 +25,7 @@ The source code for this document can be found in my GitHub here: <https://githu
 
 ## The Grammar of Graphics
 
-Now let's move on to to learning about `ggplot2`. `ggplot2` is an `R` graphic package developed by [Hadley Wickham](http://hadley.nz) to implement the [grammar of graphics] (http://www.amazon.com/The-Grammar-Graphics-Statistics-Computing/dp/0387245448) system of data visualization proposed by [Leland Wilkinson](https://www.cs.uic.edu/~wilkinson/).^[If you really want to learn about this I suggest buying the respective books from [Wickham](https://www.amazon.com/ggplot2-Elegant-Graphics-Data-Analysis/dp/331924275X/ref=as_li_ss_tl?ie=UTF8&linkCode=sl1&tag=ggplot2-20&linkId=4b4de5146fdafd09b8035e8aa656f300), [Wilkinson](http://www.amazon.com/The-Grammar-Graphics-Statistics-Computing/dp/0387245448), and possibly others (@Wilkinson:2006, @Wickham:2016, @Wickham:2017). The [R for Data Science](https://r4ds.had.co.nz) book is also a great resource. I do not know these authors but highly respect their work (obviously, that's the point of all this!).] The general idea is that all plots should have some basic features that make them interchangeable in the same way, no matter what is being plotted. This of it as a language for reading and writing plots. In practice `ggplot2` has become the gold standard for plotting statistical data in most statistical-heavy disciplines such as bio-statistics, economics, political science, and statistics. The basic `ggplot2` implementation of the grammar of graphics is summarized as follows:
+Now let's move on to to learning about `ggplot2`. `ggplot2` is an `R` graphic package developed by [Hadley Wickham](http://hadley.nz) to implement (a layered version) the [grammar of graphics] (http://www.amazon.com/The-Grammar-Graphics-Statistics-Computing/dp/0387245448) system of data visualization proposed by [Leland Wilkinson](https://www.cs.uic.edu/~wilkinson/).^[If you really want to learn about this I suggest buying the respective books from [Wickham](https://www.amazon.com/ggplot2-Elegant-Graphics-Data-Analysis/dp/331924275X/ref=as_li_ss_tl?ie=UTF8&linkCode=sl1&tag=ggplot2-20&linkId=4b4de5146fdafd09b8035e8aa656f300), [Wilkinson](http://www.amazon.com/The-Grammar-Graphics-Statistics-Computing/dp/0387245448), and possibly others (@Wilkinson:2006, @Wickham:2016, @Wickham:2017). The [R for Data Science](https://r4ds.had.co.nz) book is also a great resource. I do not know these authors but highly respect their work (obviously, that's the point of all this!).] The general idea is that all plots should have some basic features that make them interchangeable in the same way, no matter what is being plotted. This of it as a language for reading and writing plots. In practice `ggplot2` has become the gold standard for plotting statistical data in most statistical-heavy disciplines such as bio-statistics, economics, political science, and statistics. The basic `ggplot2` implementation of the grammar of graphics is summarized as follows:
 
  - a default dataset with aesthetic mappings,
  - one or more layers, each with a geometric object("geom"), a statistical transformation("stat"), and a dataset with aesthetic mappings (possibly defaulted),
@@ -133,7 +132,9 @@ ggplot(mtcars, aes(wt, mpg)) +
   geom_smooth(formula = y ~ x, method = lm)
 ```
 
-Note that `geom_smooth` needs to know what kind of method we are using and the formula for the calculation of the slope. In this case we are using similar syntax to that of base `R`'s regression model function, `lm`. Our formula simply tells `ggplot()` we want to see the relationship denoted by $y = f(x)$. What if we instead wanted a horizontal line in the middle of the scatterplot? Note that this type of geom requires that you know the coordinates of the data you are plotting. 
+Note that `geom_smooth` needs to know what kind of method we are using and the formula for the calculation of the slope. In this case we are using similar syntax to that of base `R`'s regression model function, `lm`. Our formula simply tells `ggplot()` we want to see the relationship denoted by $y = f(x)$. Notice also that this our first example of layering two geoms on the same plot. This is key to understanding how the `ggplot2` system works. If we want to plot points and labels (see below), we first plot the points and then we add a layer of labels that are relative to the points. We do not plot points and label them at the same time like we would in most other graphic implementations. Once you get this, you will begin to think of your plots as a set of layers that can be added or removed based on your needs. 
+
+What if we instead wanted a horizontal line in the middle of the scatterplot? Note that this type of geom requires that you know the coordinates of the data you are plotting. 
 
 ```{r geom_3}
 ggplot(mtcars, aes(wt, mpg)) +
@@ -148,17 +149,102 @@ ggplot(mtcars, aes(carb)) +
   geom_bar() 
 ```
 
+We will get back to some more interesting bar plot as this one is akin to a histogram, which we can also easily do since there is a geom for it. Returning to `mpg` 
+
+```{r geom_5}
+ggplot(mtcars, aes(mpg)) + 
+  geom_histogram(bins = 10) 
+```
+
+Relatedly, we can easily make a density plot:
+
+```{r geom_6}
+ggplot(mtcars, aes(mpg)) + 
+  geom_density() 
+```
+
+There are many types of geoms, but hopefully now you are getting an idea of how we use them. We will see quite a few more by the time we are done so for now I want to move on to the next basic building block of a plot. 
+
 ### Scales
 
+Scales are used within `ggplot2` to determine how the data being plotted looks to those of us reading the plot. I use scales in two primary ways, one to control the colors of the geoms and the other to format the axes. There are more extensions as well, but let's just focus on these two for now to create an illustrative example. 
+
+
+
+### Coordinate Systems
+
+You have probably already noticed that `ggplot2` builds graphs on Cartesian coordinates by default, and it explicitly draws a grid of these coordinates thus mapping the `x` and `y` aesthetics quite clearly. We can decide whether we need this level of detail for the coordinates later, but for now it is important to understand a few basics. First and foremost, the default is Cartesian and these can be flipped (using the aptly named `coord_flip()` function) such that `x` and `y` swap places. The most basic example is to use our bar plot from above:
+
+```{r coord_1}
+ggplot(mtcars, aes(carb)) + 
+  geom_bar() +
+  coord_flip()
+```
+
+We will get to some nicer examples of flipped plots later, but there is just a bit more to say on coordinates. You can do some basic tweaking of the default coordinates by fixing the aspect ratio (`coord_fixed()`), projecting maps (`coord_map()`), or using `coord_trans()` to do transformations of the coordinates (e.g., logarithms). Finally, all of this may make you wonder how in the world you would make a pie chart using `ggplot2`. The answer from many (and sometimes me) would be that you shouldn't. But, if you must, `coord_polar` is a good place to start.^[`ggforce` has some nice implementations of pie charts, see example in this document.]
+
 ### Facets
+
+Facets are essentially a way of paneling your plot based on different categories or levels of variables. Let's return to our scatterplot from above for an example that will make things clear. The difference is that this time we will split the observations into two plots, one for manual transmissions (`1`) and one for automatic (`0`). 
+
+```{r facet_1}
+ggplot(mtcars, aes(wt, mpg)) +
+  geom_point() +
+  geom_smooth(formula = y ~ x, method = lm) +
+  facet_wrap(vars(am))
+```
+
+There are two types of faceting, `facet_grid()` and `facet_wrap()`. In this case they are essentially equivalent but when we get to more categories below we will see the distinction more clearly. In terms of the syntax, much of the older code you will see would instead have something like this `facet_wrap(.~am)` but the newer versions of the package allow for the cleaner usage of `vars()`. You can facet by multiple variables if you wish, and you can control many things about how the facets look and are organized. We will have more examples below. 
 
 ### Making Your Plot Look Good
 
 There are many, many opinions on how plots should look. As such, the style we end up with here will mainly be my own preference. Hopefully between this and the next section I can give you the tools you need to make the plots look as you would like them to. This is also where the library of options within `ggplot2` explodes, so I am certainly not calling this a comprehensive treatment of plot improvement beyond the default.^[Years ago when I was a graduate student you wanted to use the default to show you could use `R` and `ggplot2`. These days, since everyone is doing it, the goal is often to move as far from the default as possible.] 
 
+#### Themes
+
+In terms of the overall look of the plot, `ggplot2` includes a number of built-in themes. Let's take a look at all of them here.^[For more themes, see the section in this document where I reference the `ggthemes` package. To be really cool, see the section that follows on creating your own theme.]
+
 ## Building Your Own Theme
 
+The best theme is your own theme. —Cameron Wimpy 
+
+Seriously, I think the best way to really enjoy `ggplot2` is to really take control of how the plot looks. This matters less for exploratory efforts and drafting, but good looking plots can set your work apart in finished products. 
+
+```{r theme_final}
+theme_cam <- function () {
+  theme_minimal(base_size = 10, base_family = "SF Pro Text") %+replace%
+    theme(
+      panel.background  = element_blank(),
+      panel.border = element_blank(),
+      plot.background = element_blank(),
+      plot.margin = unit(c(1,2,1,1), "cm"),
+      legend.box.background = element_rect(fill="white", color = NA),
+      legend.key = element_rect(fill=NA, color=NA, size = 4),
+      legend.text = element_text(color = "black", size = 12),
+      legend.title = element_text(color = "black", size = 14),
+      legend.position = "bottom",
+      legend.direction = "horizontal",
+      panel.grid.major = element_line(color = "#C4C4C4"),
+      panel.grid.minor = element_blank(),
+      axis.text = element_text(color = "black"),
+      axis.title.y = element_text(color = "black", size = 16, angle = 90,
+                                  margin = margin(t = 0, r = 10, b = 0, l = 0)),
+      axis.title.x = element_text(color = "black", size = 16, angle = 0,
+                                  margin = margin(t = 10, r = 0, b = 0, l = 0)),
+      plot.title = element_text(size = 20, color = "black", hjust = 0.5,
+                                vjust=2, margin = margin(b = 10)),
+      plot.subtitle = element_text(size = 12, color = "black", hjust = 0.5,
+                                   margin = margin(b = 12)),
+      plot.caption = element_text(size = 8, margin = margin(t = 10), color =
+                                    "black", hjust = 0)
+    )
+}
+
+```
+
 ## Example Code for Lots of Plots
+
+In this section I simply make as many plots as I can to provide example code and useful starting points. It is important to again stress that some of these examples are my own takes on other examples provided online by other generous `R`/`ggplot2` users. The credit should certainly go to them. In a few cases I also provide original examples or something from my own work.^[In these cases to fully replicate the plot you will want to fork my repo and get the data.] I expect this section to be the most living part of this document so check back (probably not often) should you be interested in updates. 
 
 ## Extensions 
 
@@ -262,35 +348,6 @@ library(sjPlot)
 library(sjmisc)
 library(haven)
 
-theme_cam <- function () { 
-  theme_minimal(base_size = 9, base_family = "SF Pro Text") %+replace% 
-    theme(
-      panel.background  = element_blank(),
-      panel.border = element_blank(),
-      plot.background = element_blank(), 
-      plot.margin = unit(c(1,2,1,1), "cm"),
-      legend.box.background = element_rect(fill = "white", color = NA),
-      legend.key = element_rect(fill = NA, color=NA, size = 4),
-      legend.text = element_text(color = "black", size = 8),
-      legend.title = element_text(color = "black", size = 10),
-      legend.position = "bottom",
-      legend.direction = "horizontal",
-      panel.grid.major = element_line(color = "#C4C4C4"),
-      panel.grid.minor = element_blank(),
-      axis.text = element_text(color = "black"),
-      axis.title.y = element_text(color = "black", size = 10, angle = 90,
-                                  margin = margin(t = 0, r = 6, b = 0, l = 0)),
-      axis.title.x = element_text(color = "black", size = 10, angle = 0,
-                                  margin = margin(t = 6, r = 0, b = 0, l = 0)),
-      plot.title = element_text(size = 14, color = "black", hjust = 0.5, 
-                                vjust=2, margin = margin(b = 10)),
-      plot.subtitle = element_text(size = 12, color = "black", hjust = 0.5, 
-                                   margin = margin(b = 6)),
-      plot.caption = element_text(size = 8, margin = margin(t = 10), color = 
-                                    "black", hjust = 0)
-    )
-}
-
 spae.2016 <- read_dta("data/2016_spae.dta")
 
 reforms <- spae.2016 %>% 
@@ -327,7 +384,7 @@ p <- find_var(reforms, pattern = "Q44", out = "df") %>%
     label.position = "bottom")) + 
   labs(title = "Attitudes Towards Election Reform", subtitle = "SPAE: 2016 Election") + 
   theme_cam() +
-  theme( panel.grid = element_blank(), legend.spacing.x = unit(.1, 'cm')) 
+  theme(panel.grid = element_blank(), legend.spacing.x = unit(.1, 'cm')) 
 p
 ```
 
