@@ -233,8 +233,7 @@ ggplot(mtcars, aes(wt, mpg, color = carb)) +
   scale_x_continuous(labels = scales::comma) +
   labs(x = "Car Weight in Pounds", y = "Miles per Gallon", 
        title = "The Relationship Between Car Weight and Miles Per Gallon",
-       subtitle = "1974 Data",
-       caption = "Note: The data was extracted from the 1974 Motor Trend US magazine, and comprises fuel consumption and 10 aspects of automobile design and performance for 32 automobiles (1973–74 models).")
+       subtitle = "1974 Data")
 ```
 
 These are fairly easy, just pay attention to the quotation marks and commas. Now, what if we want a better legend title. As with some things in `ggplot2` there are multiple routes to get there. I typically just use `name = ""` inside of the scaling function as follows:
@@ -247,8 +246,7 @@ ggplot(mtcars, aes(wt, mpg, color = carb)) +
   scale_x_continuous(labels = scales::comma) +
   labs(x = "Car Weight in Pounds", y = "Miles per Gallon", 
        title = "The Relationship Between Car Weight and Miles Per Gallon",
-       subtitle = "1974 Data",
-       caption = "Note: The data was extracted from the 1974 Motor Trend US magazine, and comprises fuel consumption and 10 aspects of automobile design and performance for 32 automobiles (1973–74 models).")
+       subtitle = "1974 Data")
 ```
 
 We will deal with many more legend examples as we go along. Before getting into that, however, let me talk about some of the basics in terms of plot styling. As I mentioned above, most of our remaining action here will be inside of the `theme()` function. One of the original hallmarks of `ggplot2` was the grey background in the plotting (panel) area with the white grid lines intersecting on both major and minor grids corresponding with the axis tick labels and halfway between them. That is what we have been seeing so far. Let's start by changing the background to white.
@@ -261,8 +259,7 @@ ggplot(mtcars, aes(wt, mpg, color = carb)) +
   scale_x_continuous(labels = scales::comma) +
   labs(x = "Car Weight in Pounds", y = "Miles per Gallon", 
        title = "The Relationship Between Car Weight and Miles Per Gallon",
-       subtitle = "1974 Data",
-       caption = "Note: The data was extracted from the 1974 Motor Trend US magazine, and comprises fuel consumption and 10 aspects of automobile design and performance for 32 automobiles (1973–74 models).") +
+       subtitle = "1974 Data") +
   theme(panel.background = element_rect(fill = "#FFFFFF"))
 ```
 
@@ -276,8 +273,7 @@ ggplot(mtcars, aes(wt, mpg, color = carb)) +
   scale_x_continuous(labels = scales::comma) +
   labs(x = "Car Weight in Pounds", y = "Miles per Gallon", 
        title = "The Relationship Between Car Weight and Miles Per Gallon",
-       subtitle = "1974 Data",
-       caption = "Note: The data was extracted from the 1974 Motor Trend US magazine, and comprises fuel consumption and 10 aspects of automobile design and performance for 32 automobiles (1973–74 models).") +
+       subtitle = "1974 Data") +
   theme(panel.background = element_rect(fill = "#FFFFFF"), plot.background = element_rect(fill = "#cc092f"))
 ```
 
@@ -291,8 +287,7 @@ ggplot(mtcars, aes(wt, mpg, color = carb)) +
   scale_x_continuous(labels = scales::comma) +
   labs(x = "Car Weight in Pounds", y = "Miles per Gallon", 
        title = "The Relationship Between Car Weight and Miles Per Gallon",
-       subtitle = "1974 Data",
-       caption = "Note: The data was extracted from the 1974 Motor Trend US magazine, and comprises fuel consumption and 10 aspects of automobile design and performance for 32 automobiles (1973–74 models).") +
+       subtitle = "1974 Data") +
   theme(panel.background = element_blank(), 
         plot.background = element_blank())
 ```
@@ -307,8 +302,7 @@ ggplot(mtcars, aes(wt, mpg, color = carb)) +
   scale_x_continuous(labels = scales::comma) +
   labs(x = "Car Weight in Pounds", y = "Miles per Gallon", 
        title = "The Relationship Between Car Weight and Miles Per Gallon",
-       subtitle = "1974 Data",
-       caption = "Note: The data was extracted from the 1974 Motor Trend US magazine, and comprises fuel consumption and 10 aspects of automobile design and performance for 32 automobiles (1973–74 models).") +
+       subtitle = "1974 Data") +
   theme(panel.background = element_blank(), 
         plot.background = element_blank(),
         panel.grid.major = element_line(color = "#C4C4C4"))
@@ -326,19 +320,18 @@ ggplot(mtcars, aes(wt, mpg, color = carb)) +
   scale_x_continuous(labels = scales::comma) +
   labs(x = "Car Weight in Pounds", y = "Miles per Gallon", 
        title = "The Relationship Between Car Weight and Miles Per Gallon",
-       subtitle = "1974 Data",
-       caption = "Note: The data was extracted from the 1974 Motor Trend US magazine, and comprises fuel consumption and 10 aspects of automobile design and performance for 32 automobiles (1973–74 models).") +
+       subtitle = "1974 Data") +
   theme(panel.background = element_blank(), 
         plot.background = element_blank(),
         panel.grid.major = element_line(color = "#C4C4C4"),
         axis.ticks = element_blank())
 ```
 
-
+This gets us to a fairly nice looking plot. We will explore some additional `theme()` options below. 
 
 #### Themes
 
-In terms of the overall look of the plot, `ggplot2` includes a number of built-in themes. Let's take a look at most of them here.^[For more themes, see the section in this document where I reference the `ggthemes` package. To be really cool, see the section that follows on creating your own theme.]
+In terms of the overall look of the plot, `ggplot2` includes a number of built-in themes. Let's take a look at most of them here.^[For more themes, see the section in this document where I reference the `ggthemes` package. To be really cool, see the section that follows on creating your own theme.] Keep in mind you can do additional customization to any of these themes but your options will need to be added after the theme itself. Otherwise the change in theme would overwrite all of your changes.
 
 ##### Black & White
 
@@ -346,12 +339,11 @@ In terms of the overall look of the plot, `ggplot2` includes a number of built-i
 ggplot(mtcars, aes(wt * 1000, mpg, color = carb)) +
   geom_point() +
   geom_smooth(formula = y ~ x, method = lm) +
-  scale_color_continuous() +
+  scale_color_continuous(name = "Carburetors") +
   scale_x_continuous(labels = scales::comma) + 
   labs(x = "Car Weight in Pounds", y = "Miles per Gallon", 
        title = "The Relationship Between Car Weight and Miles Per Gallon",
-       subtitle = "1974 Data",
-       caption = "Note: The data was extracted from the 1974 Motor Trend US magazine, and comprises fuel consumption and 10 aspects of automobile design and performance for 32 automobiles (1973–74 models).") +
+       subtitle = "1974 Data") +
   theme_bw()
 ```
 
@@ -361,12 +353,11 @@ ggplot(mtcars, aes(wt * 1000, mpg, color = carb)) +
 ggplot(mtcars, aes(wt * 1000, mpg, color = carb)) +
   geom_point() +
   geom_smooth(formula = y ~ x, method = lm) +
-  scale_color_continuous() +
+  scale_color_continuous(name = "Carburetors") +
   scale_x_continuous(labels = scales::comma) + 
   labs(x = "Car Weight in Pounds", y = "Miles per Gallon", 
        title = "The Relationship Between Car Weight and Miles Per Gallon",
-       subtitle = "1974 Data",
-       caption = "Note: The data was extracted from the 1974 Motor Trend US magazine, and comprises fuel consumption and 10 aspects of automobile design and performance for 32 automobiles (1973–74 models).") +
+       subtitle = "1974 Data") +
   theme_classic()
 ```
 
@@ -376,12 +367,11 @@ ggplot(mtcars, aes(wt * 1000, mpg, color = carb)) +
 ggplot(mtcars, aes(wt * 1000, mpg, color = carb)) +
   geom_point() +
   geom_smooth(formula = y ~ x, method = lm) +
-  scale_color_continuous() +
+  scale_color_continuous(name = "Carburetors") +
   scale_x_continuous(labels = scales::comma) + 
   labs(x = "Car Weight in Pounds", y = "Miles per Gallon", 
        title = "The Relationship Between Car Weight and Miles Per Gallon",
-       subtitle = "1974 Data",
-       caption = "Note: The data was extracted from the 1974 Motor Trend US magazine, and comprises fuel consumption and 10 aspects of automobile design and performance for 32 automobiles (1973–74 models).") +
+       subtitle = "1974 Data") +
   theme_dark()
 ```
 
@@ -391,12 +381,11 @@ ggplot(mtcars, aes(wt * 1000, mpg, color = carb)) +
 ggplot(mtcars, aes(wt * 1000, mpg, color = carb)) +
   geom_point() +
   geom_smooth(formula = y ~ x, method = lm) +
-  scale_color_continuous() +
+  scale_color_continuous(name = "Carburetors") +
   scale_x_continuous(labels = scales::comma) + 
   labs(x = "Car Weight in Pounds", y = "Miles per Gallon", 
        title = "The Relationship Between Car Weight and Miles Per Gallon",
-       subtitle = "1974 Data",
-       caption = "Note: The data was extracted from the 1974 Motor Trend US magazine, and comprises fuel consumption and 10 aspects of automobile design and performance for 32 automobiles (1973–74 models).") +
+       subtitle = "1974 Data") +
   theme_light()
 ```
 
@@ -406,12 +395,11 @@ ggplot(mtcars, aes(wt * 1000, mpg, color = carb)) +
 ggplot(mtcars, aes(wt * 1000, mpg, color = carb)) +
   geom_point() +
   geom_smooth(formula = y ~ x, method = lm) +
-  scale_color_continuous() +
+  scale_color_continuous(name = "Carburetors") +
   scale_x_continuous(labels = scales::comma) + 
   labs(x = "Car Weight in Pounds", y = "Miles per Gallon", 
        title = "The Relationship Between Car Weight and Miles Per Gallon",
-       subtitle = "1974 Data",
-       caption = "Note: The data was extracted from the 1974 Motor Trend US magazine, and comprises fuel consumption and 10 aspects of automobile design and performance for 32 automobiles (1973–74 models).") +
+       subtitle = "1974 Data") +
   theme_linedraw()
 ```
 
@@ -421,12 +409,11 @@ ggplot(mtcars, aes(wt * 1000, mpg, color = carb)) +
 ggplot(mtcars, aes(wt * 1000, mpg, color = carb)) +
   geom_point() +
   geom_smooth(formula = y ~ x, method = lm) +
-  scale_color_continuous() +
+  scale_color_continuous(name = "Carburetors") +
   scale_x_continuous(labels = scales::comma) + 
   labs(x = "Car Weight in Pounds", y = "Miles per Gallon", 
        title = "The Relationship Between Car Weight and Miles Per Gallon",
-       subtitle = "1974 Data",
-       caption = "Note: The data was extracted from the 1974 Motor Trend US magazine, and comprises fuel consumption and 10 aspects of automobile design and performance for 32 automobiles (1973–74 models).") +
+       subtitle = "1974 Data") +
   theme_minimal()
 ```
 
@@ -436,12 +423,11 @@ ggplot(mtcars, aes(wt * 1000, mpg, color = carb)) +
 ggplot(mtcars, aes(wt * 1000, mpg, color = carb)) +
   geom_point() +
   geom_smooth(formula = y ~ x, method = lm) +
-  scale_color_continuous() +
+  scale_color_continuous(name = "Carburetors") +
   scale_x_continuous(labels = scales::comma) + 
   labs(x = "Car Weight in Pounds", y = "Miles per Gallon", 
        title = "The Relationship Between Car Weight and Miles Per Gallon",
-       subtitle = "1974 Data",
-       caption = "Note: The data was extracted from the 1974 Motor Trend US magazine, and comprises fuel consumption and 10 aspects of automobile design and performance for 32 automobiles (1973–74 models).") +
+       subtitle = "1974 Data") +
   theme_void()
 ```
 
@@ -468,18 +454,33 @@ theme_cam <- function () {
       panel.grid.major = element_line(color = "#C4C4C4"),
       panel.grid.minor = element_blank(),
       axis.text = element_text(color = "black"),
-      axis.title = element_text(color = "black", size = 16, angle = 90,
+      axis.title = element_text(color = "black", size = 14,
                                   margin = margin(t = 0, r = 10, b = 0, l = 0)),
-      plot.title = element_text(size = 20, color = "black", hjust = 0.5,
+      plot.title = element_text(size = 16, color = "black", hjust = 0.5,
                                 vjust = 2, margin = margin(b = 10)),
-      plot.subtitle = element_text(size = 12, color = "black", hjust = 0.5,
+      plot.subtitle = element_text(size = 14, color = "black", hjust = 0.5,
                                    margin = margin(b = 12)),
-      plot.caption = element_text(size = 8, margin = margin(t = 10), color =
+      plot.caption = element_text(size = 9, margin = margin(t = 10), color =
                                     "black", hjust = 0)
     )
 }
-
 ```
+
+Now that we have done that let's look to see how we end up. I will talk about some of the new `theme()` options below. 
+
+```{r custom_theme}
+ggplot(mtcars, aes(wt * 1000, mpg, color = carb)) +
+  geom_smooth(formula = y ~ x, method = lm) +
+  geom_point() +
+  scale_color_continuous(name = "Carburetors") +
+  scale_x_continuous(labels = scales::comma) + 
+  labs(x = "Car Weight in Pounds", y = "Miles per Gallon", 
+       title = "The Relationship Between Car Weight and Miles Per Gallon",
+       subtitle = "1974 Data") +
+  theme_cam()
+```
+
+Notice that one thing I did here was to plot the linear fit first so the points sit on top. Otherwise, let's talk a bit more about the theme options I have added. Most of them have some explanation built right into their names. `plot.margin` allows for adjusting the extra space around the outside of the plot. I like to move the legend to the bottom by using `legend.position = "bottom"` and then make it horizontal by using `legend.direction = "horizontal"`. The other aspects worth mentioning here are the adjustments in `plot.title`, `plot.subtitle`, and `plot.caption`. `hjust = 0.5` moves the text to the center of the plot. In this case, `0` would be the far left and `1` would be the far right. `0.5`, of course, falls right in the middle. `vjust = 2` just moves the title (in this case) a little higher. `margin = margin(b = 10))`, for example, adds 10 points of space in the margin below. For these, `b` stands for bottom, `t` for top, `l` for left, and `r` for right. Most of the other items should make sense based on what we have seen so far but we will see a bit more on theme options in the section that follows.
 
 ## Example Code for Lots of Plots
 
