@@ -644,5 +644,4 @@ There are no shortage of other `ggplot2` tutorials available online. Just snoop 
  - [This tutorial from Zev Ross](http://zevross.com/blog/2014/08/04/beautiful-plotting-in-r-a-ggplot2-cheatsheet-3/)
  - [UCLA IDRE](https://stats.idre.ucla.edu/r/seminars/ggplot2_intro/)
 
-## References
-
+## References & Notes
