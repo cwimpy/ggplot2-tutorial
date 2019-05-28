@@ -473,18 +473,84 @@ ggplot(mtcars, aes(wt * 1000, mpg, color = carb)) +
   geom_smooth(formula = y ~ x, method = lm) +
   geom_point() +
   scale_color_continuous(name = "Carburetors") +
-  scale_x_continuous(labels = scales::comma) + 
+  scale_x_continuous(breaks = c(1500,2000,2500,3000,3500,4000,4500,5000,5500), labels = scales::comma) + 
+  scale_y_continuous(breaks = c(5,10,15,20,25,30,35)) + 
   labs(x = "Car Weight in Pounds", y = "Miles per Gallon", 
        title = "The Relationship Between Car Weight and Miles Per Gallon",
        subtitle = "1974 Data") +
   theme_cam()
 ```
 
-Notice that one thing I did here was to plot the linear fit first so the points sit on top. Otherwise, let's talk a bit more about the theme options I have added. Most of them have some explanation built right into their names. `plot.margin` allows for adjusting the extra space around the outside of the plot. I like to move the legend to the bottom by using `legend.position = "bottom"` and then make it horizontal by using `legend.direction = "horizontal"`. The other aspects worth mentioning here are the adjustments in `plot.title`, `plot.subtitle`, and `plot.caption`. `hjust = 0.5` moves the text to the center of the plot. In this case, `0` would be the far left and `1` would be the far right. `0.5`, of course, falls right in the middle. `vjust = 2` just moves the title (in this case) a little higher. `margin = margin(b = 10))`, for example, adds 10 points of space in the margin below. For these, `b` stands for bottom, `t` for top, `l` for left, and `r` for right. Most of the other items should make sense based on what we have seen so far but we will see a bit more on theme options in the section that follows.
+Notice that one thing I did here was to plot the linear fit first so the points sit on top. I also specified the exact breaks I wanted on the axis scales.
+
+Otherwise, let's talk a bit more about the theme options I have added. Most of them have some explanation built right into their names. `plot.margin` allows for adjusting the extra space around the outside of the plot. I like to move the legend to the bottom by using `legend.position = "bottom"` and then make it horizontal by using `legend.direction = "horizontal"`. The other aspects worth mentioning here are the adjustments in `plot.title`, `plot.subtitle`, and `plot.caption`. `hjust = 0.5` moves the text to the center of the plot. In this case, `0` would be the far left and `1` would be the far right. `0.5`, of course, falls right in the middle. `vjust = 2` just moves the title (in this case) a little higher. `margin = margin(b = 10))`, for example, adds 10 points of space in the margin below. For these, `b` stands for bottom, `t` for top, `l` for left, and `r` for right. Most of the other items should make sense based on what we have seen so far but we will see a bit more on theme options in the section that follows.
 
 ## Example Code for Lots of Plots
 
 In this section I simply make as many plots as I can to provide example code and useful starting points. It is important to again stress that some of these examples are my own takes on other examples provided online by other generous `R`/`ggplot2` users. The credit should certainly go to them. In a few cases I also provide original examples or something from my own work.^[In these cases to fully replicate the plot you will want to fork my repo and get the data.] I expect this section to be the most living part of this document so check back (probably not often) should you be interested in updates. 
+
+### Bar Plots
+
+Let's start with a basic bar chart. 
+
+```{r bar1}
+ggplot(mtcars, aes(carb)) + 
+  geom_bar() + 
+  labs(x = "Number of Carburetors", y = "Count") +
+  theme_cam()
+```
+
+What if we wanted to treat each level for the number of carburetors as discrete? We can just wrap it in `factor()` and the use `fill = ` inside our aesthetic (`aes()`) function.
+
+```{r bar2}
+ggplot(mtcars, aes(factor(carb), fill = factor(carb))) + 
+  geom_bar() + 
+  labs(x = "Number of Carburetors", y = "Count") +
+  theme_cam()
+```
+
+Ugh, who needs that ugly legend title? We will get to those in some other examples but for now let's just kill the legend.
+
+```{r bar3}
+ggplot(mtcars, aes(factor(carb), fill = factor(carb))) + 
+  geom_bar() + 
+  labs(x = "Number of Carburetors", y = "Count") +
+  theme_cam() +
+  theme(legend.position = "none")
+```
+
+There is more than one way to remove the legend but this one is the clearest in my view. Notice that by putting `theme(legend.position = "none")` below `theme_cam` we overrode my preference for the legend in my custom theme function. Had we put it above the legend would still be there. Ordering matters in these things.
+
+#### Grouped Bar Chart
+
+How about a grouped bar char for horsepower by cylinder but grouped by transmission type?
+
+```{r grouped bar}
+ggplot(mtcars, aes(cyl, hp, fill=factor(am))) +
+  geom_bar(stat = "identity", position = position_dodge()) +
+  labs(title="Grouped Bar Chart", 
+       x = "Cylinders",
+       y = "Horsepower") +
+  scale_fill_discrete(guide = guide_legend(title = "Transmission", nrow = 1), 
+                    labels=c("Automatic", "Manual")) + 
+  scale_x_continuous(breaks = c(4,6,8)) +
+theme_cam()
+```
+
+Notice some new options here. This is the first time I have used a discrete scale (`scale_fill_discrete`), and this allows us to name the legend easily using the options avaialble in `guide = ` and then provide some custom labels for the discrete scale. Let's go one step further and manually define the colors using `scale_fill_manual`.
+
+```{r grouped ba2}
+ggplot(mtcars, aes(cyl, hp, fill=factor(am))) +
+  geom_bar(stat = "identity", position = position_dodge()) +
+  labs(title="Grouped Bar Chart", 
+       x = "Cylinders",
+       y = "Horsepower") +
+  scale_fill_manual(guide = guide_legend(title = "Transmission", nrow = 1), 
+                    labels=c("Automatic", "Manual"),
+                    values = c("#008000","#ff0000")) + 
+  scale_x_continuous(breaks = c(4,6,8)) +
+theme_cam()
+```
 
 ## Extensions 
 
