@@ -251,7 +251,90 @@ ggplot(mtcars, aes(wt, mpg, color = carb)) +
        caption = "Note: The data was extracted from the 1974 Motor Trend US magazine, and comprises fuel consumption and 10 aspects of automobile design and performance for 32 automobiles (1973–74 models).")
 ```
 
-We will deal with many more legend examples as we go along. Before getting into that, however, let me talk about some of the basics in terms of plot styling. As I mentioned above, most of our remaining action here will be inside of the `theme()` function. 
+We will deal with many more legend examples as we go along. Before getting into that, however, let me talk about some of the basics in terms of plot styling. As I mentioned above, most of our remaining action here will be inside of the `theme()` function. One of the original hallmarks of `ggplot2` was the grey background in the plotting (panel) area with the white grid lines interseccting on both major and minor grids correpsonmding with the axis tick labels and halfway between them. That is what we have been seeing so far. Let's start by changing the background to white.
+
+```{r white_background}
+ggplot(mtcars, aes(wt, mpg, color = carb)) +
+  geom_point() +
+  geom_smooth(formula = y ~ x, method = lm) +
+  scale_color_continuous(name = "Carburetors") +
+  scale_x_continuous(labels = scales::comma) +
+  labs(x = "Car Weight in Pounds", y = "Miles per Gallon", 
+       title = "The Relationship Between Car Weight and Miles Per Gallon",
+       subtitle = "1974 Data",
+       caption = "Note: The data was extracted from the 1974 Motor Trend US magazine, and comprises fuel consumption and 10 aspects of automobile design and performance for 32 automobiles (1973–74 models).") +
+  theme(panel.background = element_rect(fill = "#FFFFFF"))
+```
+
+Notice that I started here with `theme` and then referenced the specific aspect of the theme I wanted to change. `panel.background` refers to the plotting area. `plot.background`, on the other hand, refers to the area outside the plot. For example, we could do this to fill in the plot area with A-State red:
+
+```{r white-red_background}
+ggplot(mtcars, aes(wt, mpg, color = carb)) +
+  geom_point() +
+  geom_smooth(formula = y ~ x, method = lm) +
+  scale_color_continuous(name = "Carburetors") +
+  scale_x_continuous(labels = scales::comma) +
+  labs(x = "Car Weight in Pounds", y = "Miles per Gallon", 
+       title = "The Relationship Between Car Weight and Miles Per Gallon",
+       subtitle = "1974 Data",
+       caption = "Note: The data was extracted from the 1974 Motor Trend US magazine, and comprises fuel consumption and 10 aspects of automobile design and performance for 32 automobiles (1973–74 models).") +
+  theme(panel.background = element_rect(fill = "#FFFFFF"), plot.background = element_rect(fill = "#cc092f"))
+```
+
+Notice here that I added the additional theming option within the same function, but for clarity you could also just have a series of theme functions each on their own line. In any case, you would want to make your code legible as the options can get lengthy quite quickly. Now, if you ask me, no color at all in the background is the way to roll. That will leave us with a blank (alebit white) canvase for both the plot and panel.
+
+```{r blank_background}
+ggplot(mtcars, aes(wt, mpg, color = carb)) +
+  geom_point() +
+  geom_smooth(formula = y ~ x, method = lm) +
+  scale_color_continuous(name = "Carburetors") +
+  scale_x_continuous(labels = scales::comma) +
+  labs(x = "Car Weight in Pounds", y = "Miles per Gallon", 
+       title = "The Relationship Between Car Weight and Miles Per Gallon",
+       subtitle = "1974 Data",
+       caption = "Note: The data was extracted from the 1974 Motor Trend US magazine, and comprises fuel consumption and 10 aspects of automobile design and performance for 32 automobiles (1973–74 models).") +
+  theme(panel.background = element_blank(), 
+        plot.background = element_blank())
+```
+
+Notice here that we have gone from specifying a color for the rectangle elemtents (`element_rect()`) to just making those elements blank. This lingo will become clearer the more time you spend with it, so if it is confusing now please just hang around a little longer. I like the grid lines as a default, so let's bring them back in a casual grey but just for the major grids:
+
+```{r grids}
+ggplot(mtcars, aes(wt, mpg, color = carb)) +
+  geom_point() +
+  geom_smooth(formula = y ~ x, method = lm) +
+  scale_color_continuous(name = "Carburetors") +
+  scale_x_continuous(labels = scales::comma) +
+  labs(x = "Car Weight in Pounds", y = "Miles per Gallon", 
+       title = "The Relationship Between Car Weight and Miles Per Gallon",
+       subtitle = "1974 Data",
+       caption = "Note: The data was extracted from the 1974 Motor Trend US magazine, and comprises fuel consumption and 10 aspects of automobile design and performance for 32 automobiles (1973–74 models).") +
+  theme(panel.background = element_blank(), 
+        plot.background = element_blank(),
+        panel.grid.major = element_line(color = "#C4C4C4"))
+```
+
+Notice that we used `panel.grid.major` here. As you may suspect, `panel.grid.minor` would take care of those minor lines if we wanted them back. But, what may be less obvious, is that `panel.grid` would handle the major and minor grids together if you so wished. This goes for lots of things in the themes. For example, if we wanted to make our x-axis text as 12 point we would do this: theme(axis.t) 
+
+But, ugh, now our grid lines conflict with our axis tick colors. We have two options, we could remove the ticks or change the colors (a lame third option would be to leave things as is). I prefer to just remove the ticks in this case:
+
+```{r ticks}
+ggplot(mtcars, aes(wt, mpg, color = carb)) +
+  geom_point() +
+  geom_smooth(formula = y ~ x, method = lm) +
+  scale_color_continuous(name = "Carburetors") +
+  scale_x_continuous(labels = scales::comma) +
+  labs(x = "Car Weight in Pounds", y = "Miles per Gallon", 
+       title = "The Relationship Between Car Weight and Miles Per Gallon",
+       subtitle = "1974 Data",
+       caption = "Note: The data was extracted from the 1974 Motor Trend US magazine, and comprises fuel consumption and 10 aspects of automobile design and performance for 32 automobiles (1973–74 models).") +
+  theme(panel.background = element_blank(), 
+        plot.background = element_blank(),
+        panel.grid.major = element_line(color = "#C4C4C4"),
+        axis.ticks = element_blank())
+```
+
+
 
 #### Themes
 
@@ -366,11 +449,11 @@ ggplot(mtcars, aes(wt * 1000, mpg, color = carb)) +
 
 > The best theme is your own theme. —Cameron Wimpy 
 
-Seriously, I think the best way to really enjoy `ggplot2` is to really take control of how the plot looks. This matters less for exploratory efforts and drafting, but good looking plots can set your work apart in finished products. 
+Seriously, I think the best way to really enjoy `ggplot2` is to really take control of how the plot looks. This matters less for exploratory efforts and drafting, but good looking plots can set your work apart in finished products. If we return to all the things we did to our theme earlier, we could actually roll those into our own theme function and thus our tweaks for a given plot would be minor since the new default (using our function) would already look close to how we like it. Notice, inside the `theme()` function below I am just calling a bunch of theme options, some of which you already know.^[Go [here](https://ggplot2.tidyverse.org/reference/theme.html) to see them all.] The rest of what I am doing here is just creating the function. I am overwriting the minimal theme as a starting point and giving you a place to update your fonts. Since fonts can be tricky and are often user/OS-specific, I will let you learn about that separetely. But, as an example, I use the "SF Pro Text" font from [Apple](https://developer.apple.com/fonts/). To use this here, I would just replace `"Helvetica"` below with `"SF Pro Text"`.^[Note that you would need to install the font and make sure `R` knows how to find it and that you are using the exact right name. Again, if you are into this sort of thing, I suggest learning about it separate and apart from `ggplot2`.]
 
 ```{r theme_final}
 theme_cam <- function () {
-  theme_minimal(base_size = 10, base_family = "SF Pro Text") %+replace%
+  theme_minimal(base_size = 10, base_family = "Helvetica") %+replace%
     theme(
       panel.background  = element_blank(),
       panel.border = element_blank(),
