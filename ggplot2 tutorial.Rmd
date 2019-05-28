@@ -525,7 +525,7 @@ There is more than one way to remove the legend but this one is the clearest in 
 
 How about a grouped bar char for horsepower by cylinder but grouped by transmission type?
 
-```{r grouped bar}
+```{r grouped_bar}
 ggplot(mtcars, aes(cyl, hp, fill=factor(am))) +
   geom_bar(stat = "identity", position = position_dodge()) +
   labs(title="Grouped Bar Chart", 
@@ -539,7 +539,7 @@ theme_cam()
 
 Notice some new options here. This is the first time I have used a discrete scale (`scale_fill_discrete`), and this allows us to name the legend easily using the options avaialble in `guide = ` and then provide some custom labels for the discrete scale. Let's go one step further and manually define the colors using `scale_fill_manual`.
 
-```{r grouped ba2}
+```{r grouped_bar2}
 ggplot(mtcars, aes(cyl, hp, fill=factor(am))) +
   geom_bar(stat = "identity", position = position_dodge()) +
   labs(title="Grouped Bar Chart", 
@@ -551,6 +551,7 @@ ggplot(mtcars, aes(cyl, hp, fill=factor(am))) +
   scale_x_continuous(breaks = c(4,6,8)) +
 theme_cam()
 ```
+
 
 ## Extensions 
 
