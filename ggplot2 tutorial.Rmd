@@ -487,7 +487,7 @@ Otherwise, let's talk a bit more about the theme options I have added. Most of t
 
 ## Example Code for Lots of Plots
 
-In this section I simply make as many plots as I can to provide example code and useful starting points. It is important to again stress that some of these examples are my own takes on other examples provided online by other generous `R`/`ggplot2` users. The credit should certainly go to them. In a few cases I also provide original examples or something from my own work.^[In these cases to fully replicate the plot you will want to fork my repo and get the data.] I expect this section to be the most living part of this document so check back (probably not often) should you be interested in updates. 
+In this section I simply make as many plots as I can to provide example code and useful starting points. It is important to again stress that some of these examples are my own takes on other examples provided online by other generous `R`/`ggplot2` users. The credit should certainly go to them. In a few cases I also provide original examples or something from my own work.^[In these cases to fully replicate the plot you will want to fork my repo and get the data.] I expect this section to be the most living part of this document so check back (probably not often) should you be interested in updates. In a number of cases we need to do some minor data work before making our plot—hopefully you find those examples to be useful as well.
 
 ### Bar Plots
 
@@ -552,6 +552,44 @@ ggplot(mtcars, aes(cyl, hp, fill=factor(am))) +
 theme_cam()
 ```
 
+#### Stacked Bar Chart
+
+For this one I am going to switch to a similar dataset, `mpg`. I am going to make the car names uppercase using a helper function, but first I am going to make a working copy of the data. 
+
+```{r stack_data}
+mpg1 <- mpg 
+
+capitalize <- function(string) {
+  substr(string, 1, 1) <- toupper(substr(string, 1, 1))
+  string
+}
+
+mpg1$manufacturer <- capitalize(mpg1$manufacturer) 
+```
+
+Now we can make the plot. Notice some changes here. First, I am calling the fill aesthetic within `geom_bar`, and I also adjust the bar width. From there I am doing some adjusting on the theme based on how this plot turns out. 
+
+```{r stacked_data}
+ggplot(mpg1, aes(manufacturer)) + 
+  geom_bar(aes(fill = class), width = 0.5) + 
+  labs(title="Stacked Bar Chart", 
+       subtitle="Manufacturer of Vehicles", 
+       x = "Manufacturer",
+       y = "Count") +
+  scale_fill_discrete(guide = guide_legend(title = "Class")) + 
+  theme_cam() +
+  theme(axis.text.x = element_text(angle=65, vjust=0.6)) +
+  theme(legend.position = "right", legend.direction = "vertical")
+```
+
+### Scatterplots
+
+We already have a working scatterplot example, so I will start with something a little different and go from there. 
+
+
+### Dot Charts
+
+### Line Charts
 
 ## Extensions 
 
