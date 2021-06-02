@@ -25,7 +25,7 @@ The source code for this document can be found in my GitHub here: <https://githu
 
 ## The Grammar of Graphics
 
-Now let's move on to to learning about `ggplot2`. `ggplot2` is an `R` graphic package developed by [Hadley Wickham](http://hadley.nz) to implement (a layered version) the [grammar of graphics] (http://www.amazon.com/The-Grammar-Graphics-Statistics-Computing/dp/0387245448) system of data visualization proposed by [Leland Wilkinson](https://www.cs.uic.edu/~wilkinson/).^[If you really want to learn about this I suggest buying the respective books from [Wickham](https://www.amazon.com/ggplot2-Elegant-Graphics-Data-Analysis/dp/331924275X/ref=as_li_ss_tl?ie=UTF8&linkCode=sl1&tag=ggplot2-20&linkId=4b4de5146fdafd09b8035e8aa656f300), [Wilkinson](http://www.amazon.com/The-Grammar-Graphics-Statistics-Computing/dp/0387245448), and possibly others (@Wilkinson:2006, @Wickham:2016, @Wickham:2017). The [R for Data Science](https://r4ds.had.co.nz) book is also a great resource. I do not know these authors but highly respect their work (obviously, that's the point of all this!).] The general idea is that all plots should have some basic features that make them interchangeable in the same way, no matter what is being plotted. This of it as a language for reading and writing plots. In practice `ggplot2` has become the gold standard for plotting statistical data in most statistical-heavy disciplines such as bio-statistics, economics, political science, and statistics. The basic `ggplot2` implementation of the grammar of graphics is summarized as follows:
+Now let's move on to to learning about `ggplot2`. `ggplot2` is an `R` graphic package developed by [Hadley Wickham](http://hadley.nz) to implement (a layered version) the [grammar of graphics](http://www.amazon.com/The-Grammar-Graphics-Statistics-Computing/dp/0387245448) system of data visualization proposed by [Leland Wilkinson](https://www.cs.uic.edu/~wilkinson/).^[If you really want to learn about this I suggest buying the respective books from [Wickham](https://www.amazon.com/ggplot2-Elegant-Graphics-Data-Analysis/dp/331924275X/ref=as_li_ss_tl?ie=UTF8&linkCode=sl1&tag=ggplot2-20&linkId=4b4de5146fdafd09b8035e8aa656f300), [Wilkinson](http://www.amazon.com/The-Grammar-Graphics-Statistics-Computing/dp/0387245448), and possibly others (@Wilkinson:2006, @Wickham:2016, @Wickham:2017). The [R for Data Science](https://r4ds.had.co.nz) book is also a great resource. I do not know these authors but highly respect their work (obviously, that's the point of all this!).] The general idea is that all plots should have some basic features that make them interchangeable in the same way, no matter what is being plotted. Think of it as a language for reading and writing plots. In practice `ggplot2` has become the gold standard for plotting statistical data in most statistical-heavy disciplines such as bio-statistics, economics, political science, and statistics. The basic `ggplot2` implementation of the grammar of graphics is summarized as follows:
 
  - a default dataset with aesthetic mappings,
  - one or more layers, each with a geometric object("geom"), a statistical transformation("stat"), and a dataset with aesthetic mappings (possibly defaulted),
@@ -693,7 +693,7 @@ library(sjPlot)
 library(sjmisc)
 library(haven)
 
-spae.2016 <- read_dta("data/2016_spae.dta")
+spae.2016 <- read_dta("~/Desktop/2016_spae.dta")
 
 reforms <- spae.2016 %>% 
   select(starts_with("Q44"), weight) 
